@@ -6,9 +6,11 @@ public class Pathing {
 	HashMap<Tile, Integer> h_score = new HashMap<Tile, Integer>();
 	HashMap<Tile, Integer> f_score = new HashMap<Tile, Integer>();
 	
-	Tile path(Tile from, Tile to, Ants ants) {
+	public List<Tile> path(Tile from, Tile to, Ants ants) {
 		this.ants = ants;
-		return new Tile(from.getRow(), from.getCol());
+		//System.err.println("n: " + neighbours(from).size() + " , " + neighbours(to).size());
+		////System.err.println("start: " + from + ", to: " + to);
+		return A(from, to);
 	}
 	
 	List<Tile> A(Tile start, Tile goal) {
@@ -24,15 +26,18 @@ public class Pathing {
 		
 		while(!openset.isEmpty()) {
 			Tile x = min_score(openset);
-			if (x == goal)
+			//System.err.println("x: " + x + ", goal: " + goal);
+			if (x.equals(goal))
 				return reconstruct_path(came_from, came_from.get(goal));
 			
 			openset.remove(x);
 			closedset.add(x);
 			for (Tile y : neighbours(x)) {
+				//System.err.println("\ty: " + y);
 				if (closedset.contains(y))
 					continue;
-				int tentative_g_score = g_score.get(x) + Tile.distance(x, y);
+				int tentative_g_score = g_score.get(x) + ants.getDistance(x, y);
+				////System.err.println("\t\tscore: " + tentative_g_score);
 				
 				boolean tentative_is_better;
 				if (!openset.contains(y)) {
@@ -52,13 +57,13 @@ public class Pathing {
 				}
 			}
 		}
-		
+		System.err.println("failure");
 		// failure; return empty
 		return new ArrayList<Tile>();
 	}
 	
 	int h(Tile a, Tile b) {
-		return Integer.MAX_VALUE;
+		return ants.getDistance(a, b);
 	}
 	int f(Tile tile) {
 		return g_score.get(tile) + h_score.get(tile);
@@ -75,13 +80,16 @@ public class Pathing {
 	List<Tile> neighbours(Tile t) {
 		ArrayList<Tile> neighbours = new ArrayList<Tile>();		
         for (Aim direction : Aim.values()) {
-        	neighbours.add(ants.getTile(t, direction));
+        	Tile neighbour = ants.getTile(t, direction);
+        	if (ants.getIlk(neighbour).isUnoccupied())
+        		neighbours.add(neighbour);
         }
 		return neighbours;
 	}
 	
 	List<Tile> reconstruct_path(HashMap<Tile, Tile> came_from, Tile current_node) {
 		List<Tile> p;
+		//System.err.println("recon: " + came_from.values());
 		if (came_from.containsKey(current_node)) {
 			p = reconstruct_path(came_from, came_from.get(current_node));
 			p.add(current_node);

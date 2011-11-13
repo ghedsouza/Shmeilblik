@@ -17,11 +17,6 @@ public class Tile implements Comparable<Tile> {
         this.col = col;
     }
     
-    // Manhattan distance
-    public static int distance(Tile a, Tile b) {
-    	return Math.abs(a.row-b.row) + Math.abs(a.col-b.col);
-    }
-    
     /**
      * Returns row index.
      * 
@@ -76,4 +71,10 @@ public class Tile implements Comparable<Tile> {
     public String toString() {
         return row + " " + col;
     }
+    
+    //Manhatten distance method
+    public int distance( Tile x, Tile y) {
+    	return 0;
+    }
+    
 }

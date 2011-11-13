@@ -106,15 +106,15 @@ public class MyBot extends Bot {
             }
         }
         
-        /*
+        
         //remove hills that do not exist anymore
         for (Iterator<Tile> locIter = enemyHills.iterator(); locIter.hasNext(); ) {
         	Tile enemyHill = locIter.next();
-        	if (!ants.getEnemyHills().contains(enemyHill)) {
+        	if (ants.isVisible(enemyHill) && !ants.getEnemyHills().contains(enemyHill)) {
         		locIter.remove();
         	}
         }
-        */
+        
         // attack hills
         List<Route> hillRoutes = new ArrayList<Route>();
         for (Tile hillLoc : enemyHills) {
@@ -128,7 +128,14 @@ public class MyBot extends Bot {
         }
         Collections.sort(hillRoutes);
         for (Route route : hillRoutes) {
-            doMoveLocation(route.getStart(), route.getEnd());
+        	List<Tile> path = new Pathing().path(route.getStart(), route.getEnd(), ants);
+        	System.err.println("path size: " + path.size() + " from: " + route.getStart() + ", to: " + route.getEnd());
+        	if (path.size() > 1)
+        		doMoveLocation(route.getStart(), path.get(1));
+        	else {
+        		
+        		doMoveLocation(route.getStart(), route.getEnd());
+        	}
         }
         
         // explore unseen areas
