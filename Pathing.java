@@ -57,7 +57,7 @@ public class Pathing {
 				}
 			}
 		}
-		System.err.println("failure");
+		//System.err.println("failure");
 		// failure; return empty
 		return new ArrayList<Tile>();
 	}
@@ -81,7 +81,7 @@ public class Pathing {
 		ArrayList<Tile> neighbours = new ArrayList<Tile>();		
         for (Aim direction : Aim.values()) {
         	Tile neighbour = ants.getTile(t, direction);
-        	if (ants.getIlk(neighbour).isUnoccupied())
+        	if (!ants.getIlk(neighbour).isFriendly())
         		neighbours.add(neighbour);
         }
 		return neighbours;

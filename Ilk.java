@@ -38,4 +38,15 @@ public enum Ilk {
     public boolean isUnoccupied() {
         return this == LAND || this == DEAD;
     }
+    
+    /**
+     * Checks if this type of tile is unoccupied, which means it is a land tile or a dead ant tile.
+     * 
+     * @return <code>true</code> if this is a land tile or a dead ant tile, <code>false</code>
+     *         otherwise
+     */
+    public boolean isFriendly() {
+        return this == MY_ANT || this == WATER;
+    }
+    
 }

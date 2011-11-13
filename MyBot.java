@@ -91,10 +91,20 @@ public class MyBot extends Bot {
             }
         }
         Collections.sort(foodRoutes);
+        int gatherers = 0;
+        boolean moving = false;
         for (Route route : foodRoutes) {
             if (!foodTargets.containsKey(route.getEnd())
-                    && !foodTargets.containsValue(route.getStart())
-                    && doMoveLocation(route.getStart(), route.getEnd())) {
+                    && !foodTargets.containsValue(route.getStart())) {
+            	List<Tile> path = null;
+            	if (gatherers++ < 15)
+            		path = new Pathing().path(route.getStart(), route.getEnd(), ants);
+    			if (path != null && path.size() > 1) {
+    				moving = doMoveLocation(route.getStart(), path.get(1));
+    			} else {
+    				moving = doMoveLocation(route.getStart(), route.getEnd());
+    			}
+    			if (moving)
                 foodTargets.put(route.getEnd(), route.getStart());
             }
         }
@@ -127,15 +137,18 @@ public class MyBot extends Bot {
             }
         }
         Collections.sort(hillRoutes);
+        //hillRoutes = hillRoutes.subList(0, 1);
+        
+        int counter = 0;
         for (Route route : hillRoutes) {
-        	List<Tile> path = new Pathing().path(route.getStart(), route.getEnd(), ants);
-        	System.err.println("path size: " + path.size() + " from: " + route.getStart() + ", to: " + route.getEnd());
-        	if (path.size() > 1)
-        		doMoveLocation(route.getStart(), path.get(1));
-        	else {
-        		
-        		doMoveLocation(route.getStart(), route.getEnd());
-        	}
+        	List<Tile> path = null;
+        	if (counter++ < 25)
+        		path = new Pathing().path(route.getStart(), route.getEnd(), ants);
+			if (path != null && path.size() > 1) {
+				doMoveLocation(route.getStart(), path.get(1));
+			} else {
+				doMoveLocation(route.getStart(), route.getEnd());
+			}
         }
         
         // explore unseen areas
