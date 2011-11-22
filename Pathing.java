@@ -8,8 +8,6 @@ public class Pathing {
 	
 	public List<Tile> path(Tile from, Tile to, Ants ants) {
 		this.ants = ants;
-		//System.err.println("n: " + neighbours(from).size() + " , " + neighbours(to).size());
-		////System.err.println("start: " + from + ", to: " + to);
 		return A(from, to);
 	}
 	

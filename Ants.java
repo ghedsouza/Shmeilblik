@@ -10,41 +10,24 @@ import java.util.Set;
 public class Ants {
     /** Maximum map size. */
     public static final int MAX_MAP_SIZE = 256 * 2;
-
     private final int loadTime;
-
     private final int turnTime;
-
     private final int rows;
-
     private final int cols;
-
     private final int turns;
-
     private final int viewRadius2;
-
     private final int attackRadius2;
-
     private final int spawnRadius2;
-
     private final boolean visible[][];
-
     private final Set<Tile> visionOffsets;
-
     private long turnStartTime;
 
     private final Ilk map[][];
-
     private final Set<Tile> myAnts = new HashSet<Tile>();
-
     private final Set<Tile> enemyAnts = new HashSet<Tile>();
-
     private final Set<Tile> myHills = new HashSet<Tile>();
-
     private final Set<Tile> enemyHills = new HashSet<Tile>();
-
     private final Set<Tile> foodTiles = new HashSet<Tile>();
-
     private final Set<Order> orders = new HashSet<Order>();
 
     /**
