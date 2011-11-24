@@ -13,7 +13,7 @@ public class Pathing {
 	
 	List<Tile> A(Tile start, Tile goal) {
 		HashSet<Tile> closedset = new HashSet<Tile>(),
-				openset = new HashSet<Tile>();
+									openset = new HashSet<Tile>();
 		
 		HashMap<Tile, Tile> came_from = new HashMap<Tile, Tile>();
 		openset.add(start);
@@ -77,7 +77,8 @@ public class Pathing {
 	
 	List<Tile> neighbours(Tile t) {
 		ArrayList<Tile> neighbours = new ArrayList<Tile>();		
-        for (Aim direction : Aim.values()) {
+        for (Aim direction : Aim.values())
+        {
         	Tile neighbour = ants.getTile(t, direction);
         	if (!ants.getIlk(neighbour).isFriendly())
         		neighbours.add(neighbour);

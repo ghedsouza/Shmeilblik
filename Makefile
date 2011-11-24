@@ -1,7 +1,8 @@
 JAVAC=javac
 JAVAC_ARGS=
 
-SOURCES=Ants.java Bot.java Aim.java Ilk.java Order.java Tile.java AbstractSystemInputParser.java AbstractSystemInputReader.java MyBot.java
+#SOURCES=Ants.java Bot.java Aim.java Ilk.java Order.java Tile.java AbstractSystemInputParser.java AbstractSystemInputReader.java MyBot.java Route.java
+SOURCES=*.java
 CLASSES=$(addsuffix .class, $(basename ${SOURCES}))
 JAR=MyBot.jar
 
