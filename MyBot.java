@@ -188,11 +188,11 @@ public class MyBot extends Bot {
         for (Tile unseenLoc : unseenTiles)
         {
           int distance = ants.getDistance(antLoc, unseenLoc);
-          // Route route = new Route(antLoc, unseenLoc, distance);
-          Route route = new Route(antLoc,
-                                  new Tile( (antLoc.getRow() + ants.getRows()/2 + rand.nextInt(10))%ants.getRows(),
-                                            (antLoc.getCol() + ants.getCols()/2 + rand.nextInt(10))%ants.getCols()),
-                                  distance);
+          Route route = new Route(antLoc, unseenLoc, distance);
+          // Route route = new Route(antLoc,
+          //                         new Tile( (antLoc.getRow() + ants.getRows()/2 + rand.nextInt(10))%ants.getRows(),
+          //                                   (antLoc.getCol() + ants.getCols()/2 + rand.nextInt(10))%ants.getCols()),
+          //                         distance);
           unseenRoutes.add(route);
         }
         Collections.sort(unseenRoutes);
