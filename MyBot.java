@@ -11,6 +11,7 @@ public class MyBot extends Bot {
   private Map<Tile, Tile> orders = new HashMap<Tile, Tile>();
   private Set<Tile> unseenTiles;
   private Set<Tile> enemyHills = new HashSet<Tile>();
+  Random rand = new Random();
   int turn = 0;
 
   // Collision tracking
@@ -79,6 +80,17 @@ public class MyBot extends Bot {
       Tile next = locIter.next();
       if (ants.isVisible(next)) {
         locIter.remove();
+      }
+    }
+
+    // reexplore random tiles again
+    //unseenTiles.add(new Tile(rand.nextInt(ants.getRows()), rand.nextInt(ants.getCols())));
+
+    for (int row = 0; row < ants.getRows(); row++) {
+      for (int col = 0; col < ants.getCols(); col++) {
+        Tile tile = new Tile(row, col);
+        if (!ants.isVisible(tile) && rand.nextInt(500) == 0)
+          unseenTiles.add(tile);
       }
     }
 
@@ -162,13 +174,13 @@ public class MyBot extends Bot {
     }
 
     //err.println("explore");
-    // TODO: smarter pathing for exploration
-    // explore unseen areas
-    int maxExplorers = 15, explorerCounter = 0;
-    for (Tile antLoc : sortedAnts) {
-      int ctr = 0, max = 10;
+    int maxExplorers = 25, explorerCounter = 0;
+    for (Tile antLoc : sortedAnts)
+    {
+      int ctr = 0, max = 5;
       //err.println("\tant: " + antLoc);
-      if (!orders.containsValue(antLoc)) {
+      if (!orders.containsValue(antLoc))
+      {
         if (!(explorerCounter++ < maxExplorers))
           break;
 
@@ -176,7 +188,11 @@ public class MyBot extends Bot {
         for (Tile unseenLoc : unseenTiles)
         {
           int distance = ants.getDistance(antLoc, unseenLoc);
-          Route route = new Route(antLoc, unseenLoc, distance);
+          // Route route = new Route(antLoc, unseenLoc, distance);
+          Route route = new Route(antLoc,
+                                  new Tile( (antLoc.getRow() + ants.getRows()/2 + rand.nextInt(10))%ants.getRows(),
+                                            (antLoc.getCol() + ants.getCols()/2 + rand.nextInt(10))%ants.getCols()),
+                                  distance);
           unseenRoutes.add(route);
         }
         Collections.sort(unseenRoutes);
