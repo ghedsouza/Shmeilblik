@@ -8,11 +8,14 @@ import java.util.*;
  */
 public class MyBot extends Bot {
 
-  private Map<Tile, Tile> orders = new HashMap<Tile, Tile>();
-  private Set<Tile> unseenTiles;
-  private Set<Tile> enemyHills = new HashSet<Tile>();
+  Map<Tile, Tile> orders = new HashMap<Tile, Tile>();
+  Map<Tile, List<Tile>> pathings = new HashMap<Tile, List<Tile>>();
+  Set<Tile> unseenTiles;
+  Set<Tile> enemyHills = new HashSet<Tile>();
   Random rand = new Random(0);
   int turn = 0;
+
+  int explorerIndex = 0;
 
   // Collision tracking
   private boolean doMoveDirection(Tile antLoc, Aim direction) {
@@ -102,11 +105,11 @@ public class MyBot extends Bot {
       orders.put(myHill, null);
     }
 
-    //err.println("food");
+    err.println("food");
     // find close food
     List<Route> foodRoutes = new ArrayList<Route>();
     TreeSet<Tile> sortedFood = new TreeSet<Tile>(ants.getFoodTiles());
-    TreeSet<Tile> sortedAnts = new TreeSet<Tile>(ants.getMyAnts());
+    List<Tile> sortedAnts = new ArrayList<Tile>(ants.getMyAnts());
     for (Tile foodLoc : sortedFood) {
       for (Tile antLoc : sortedAnts) {
         int distance = ants.getDistance(antLoc, foodLoc);
@@ -131,7 +134,10 @@ public class MyBot extends Bot {
           //moving = doMoveLocation(route.getStart(), route.getEnd());
         }
         if (moving)
+        {
           foodTargets.put(route.getEnd(), route.getStart());
+          err.println("\tant " + route.getStart() + " -> " + route.getEnd());
+        }
       }
     }
 
@@ -177,44 +183,63 @@ public class MyBot extends Bot {
     }
 
     err.println("explore");
-    int maxExplorers = 50, explorerCounter = 0;
-    for (Tile antLoc : sortedAnts)
+    int maxExplorers = 5, explorerCounter = 0;
+    for (int i=0; i < sortedAnts.size(); i++) 
     {
+      Tile antLoc = sortedAnts.get( (explorerIndex + i) % sortedAnts.size() );
       err.println("\tant: " + antLoc);
       if (!orders.containsValue(antLoc))
       {
-        if (!(explorerCounter++ < maxExplorers))
-          break;
-
-        List<Route> unseenRoutes = new ArrayList<Route>();
-        for (Tile unseenLoc : unseenTiles)
+        List<Tile> path = null;
+        if (explorerCounter++ < maxExplorers)
         {
-          int distance = ants.getDistance(antLoc, unseenLoc);
-          Route route = new Route(antLoc, unseenLoc, distance);
-          unseenRoutes.add(route);
-        }
-        Collections.sort(unseenRoutes);
-
-        err.println("\t\troutes");
-        int maxRoutes = 1, routeCounter = 0;
-        for (Route route : unseenRoutes)
-        {
-          if (routeCounter++ >= maxRoutes)
-            break;
-          err.println("\t\tpath " + routeCounter + ", route: " + route);
-          List<Tile> path = new Pathing().path(route.getStart(), route.getEnd(), ants);
-          if (path != null && path.size() > 1)
+          List<Route> unseenRoutes = new ArrayList<Route>();
+          for (Tile unseenLoc : unseenTiles)
           {
-            if (doMoveLocation(route.getStart(), path.get(1)))
-              break;
-          } else {
-            err.println("\t\t\tfailed: " + path);
+            int distance = ants.getDistance(antLoc, unseenLoc);
+            Route route = new Route(antLoc, unseenLoc, distance);
+            unseenRoutes.add(route);
           }
+          Collections.sort(unseenRoutes);
+
+          err.println("\t\troutes");
+          int maxRoutes = 1, routeCounter = 0;
+          for (Route route : unseenRoutes)
+          {
+            if (routeCounter++ >= maxRoutes)
+              break;
+            err.println("\t\tpath " + routeCounter + ", route: " + route);
+            path = new Pathing().path(route.getStart(), route.getEnd(), ants);
+            if (path != null && path.size() > 1)
+              break;
+            else
+            {
+              err.println("\t\t\tfailed: " + path);
+            }
+          }
+        } else if (pathings.containsKey(antLoc)) {
+          path = pathings.get(antLoc);
+        }
+
+        if (path != null && path.size() > 1)
+        {
+          Tile nextPos = path.get(1);
+          if (doMoveLocation(antLoc, nextPos))
+          {
+            pathings.put(nextPos, path);
+            path.remove(0);
+          }
+        } else {
+          //err.println("\t\t\tfailed: " + path);
         }
         //doMoveLocation(unseenRoutes.get(0).getStart(), unseenRoutes.get(0).getEnd());
         //err.println("routes: " + i);
+      } else {
+        err.println("\t\talready");
       }
     }
+    if (sortedAnts.size() > 0)
+      explorerIndex = (explorerIndex + maxExplorers) % sortedAnts.size();
 
     // unblock hills
     for (Tile myHill : ants.getMyHills()) {
