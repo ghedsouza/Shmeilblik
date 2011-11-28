@@ -11,7 +11,7 @@ public class MyBot extends Bot {
   private Map<Tile, Tile> orders = new HashMap<Tile, Tile>();
   private Set<Tile> unseenTiles;
   private Set<Tile> enemyHills = new HashSet<Tile>();
-  Random rand = new Random();
+  Random rand = new Random(0);
   int turn = 0;
 
   // Collision tracking
@@ -19,11 +19,14 @@ public class MyBot extends Bot {
     Ants ants = getAnts();
     // Track all moves, prevent collisions
     Tile newLoc = ants.getTile(antLoc, direction);
-    if (ants.getIlk(newLoc).isUnoccupied() && !orders.containsKey(newLoc)) {
+    if (ants.getIlk(newLoc).isUnoccupied() && !orders.containsKey(newLoc))
+    {
       ants.issueOrder(antLoc, direction); // actually perform move
       orders.put(newLoc, antLoc);
       return true;
-    } else {
+    }
+    else
+    {
       return false;
     }
   }
@@ -60,7 +63,7 @@ public class MyBot extends Bot {
    */
   @Override
   public void doTurn() {
-    //err.println("Begin turn");
+    err.println("Begin turn " + (turn++));
     Ants ants = getAnts();
     orders.clear();
     Map<Tile, Tile> foodTargets = new HashMap<Tile, Tile>();
@@ -89,7 +92,7 @@ public class MyBot extends Bot {
     for (int row = 0; row < ants.getRows(); row++) {
       for (int col = 0; col < ants.getCols(); col++) {
         Tile tile = new Tile(row, col);
-        if (!ants.isVisible(tile) && rand.nextInt(500) == 0)
+        if (!ants.isVisible(tile) && ants.getIlk(tile).isPassable() && rand.nextInt(50) == 0)
           unseenTiles.add(tile);
       }
     }
@@ -173,12 +176,11 @@ public class MyBot extends Bot {
       }
     }
 
-    //err.println("explore");
-    int maxExplorers = 25, explorerCounter = 0;
+    err.println("explore");
+    int maxExplorers = 50, explorerCounter = 0;
     for (Tile antLoc : sortedAnts)
     {
-      int ctr = 0, max = 5;
-      //err.println("\tant: " + antLoc);
+      err.println("\tant: " + antLoc);
       if (!orders.containsValue(antLoc))
       {
         if (!(explorerCounter++ < maxExplorers))
@@ -189,37 +191,27 @@ public class MyBot extends Bot {
         {
           int distance = ants.getDistance(antLoc, unseenLoc);
           Route route = new Route(antLoc, unseenLoc, distance);
-          // Route route = new Route(antLoc,
-          //                         new Tile( (antLoc.getRow() + ants.getRows()/2 + rand.nextInt(10))%ants.getRows(),
-          //                                   (antLoc.getCol() + ants.getCols()/2 + rand.nextInt(10))%ants.getCols()),
-          //                         distance);
           unseenRoutes.add(route);
         }
         Collections.sort(unseenRoutes);
 
-        //err.println("\t\troutes");
-        int i = 0;
+        err.println("\t\troutes");
+        int maxRoutes = 1, routeCounter = 0;
         for (Route route : unseenRoutes)
         {
-          i++;
-          List<Tile> path = null;
-          if (ctr < max)
-          {
-            ctr++;
-            //err.println("\t\tpath " + i + ", route: " + route);
-            path = new Pathing().path(route.getStart(), route.getEnd(), ants);
-          }
+          if (routeCounter++ >= maxRoutes)
+            break;
+          err.println("\t\tpath " + routeCounter + ", route: " + route);
+          List<Tile> path = new Pathing().path(route.getStart(), route.getEnd(), ants);
           if (path != null && path.size() > 1)
           {
             if (doMoveLocation(route.getStart(), path.get(1)))
-            {
               break;
-            }
           } else {
-            doMoveLocation(route.getStart(), route.getEnd());
-            break;
+            err.println("\t\t\tfailed: " + path);
           }
         }
+        //doMoveLocation(unseenRoutes.get(0).getStart(), unseenRoutes.get(0).getEnd());
         //err.println("routes: " + i);
       }
     }
@@ -234,6 +226,5 @@ public class MyBot extends Bot {
         }
       }
     }
-    turn++;
   }
 }
