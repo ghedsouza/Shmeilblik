@@ -5,6 +5,7 @@ public class Pathing {
 	HashMap<Tile, Integer> g_score = new HashMap<Tile, Integer>();
 	HashMap<Tile, Integer> h_score = new HashMap<Tile, Integer>();
 	HashMap<Tile, Integer> f_score = new HashMap<Tile, Integer>();
+	int counter = 0;
 	
 	public List<Tile> path(Tile from, Tile to, Ants ants) {
 		this.ants = ants;
@@ -26,11 +27,15 @@ public class Pathing {
 			Tile x = min_score(openset);
 			//System.err.println("x: " + x + ", goal: " + goal);
 			if (x.equals(goal))
+			{
+				//System.err.println("pathing: " + counter);
 				return reconstruct_path(came_from, came_from.get(goal));
+			}
 			
 			openset.remove(x);
 			closedset.add(x);
 			for (Tile y : neighbours(x)) {
+				counter++;
 				//System.err.println("\ty: " + y);
 				if (closedset.contains(y))
 					continue;
